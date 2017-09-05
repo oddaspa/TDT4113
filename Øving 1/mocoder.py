@@ -32,7 +32,7 @@ class mocoder():
 	# This is where you set up the connection to the serial port.
     def __init__(self,sport=True):
         if sport:
-            self.serial_port = arduino_connect.basic_connect()
+            self.serial_port = arduino_connect.pc_connect()
         self.reset()
 
     def reset(self):
@@ -60,23 +60,61 @@ class mocoder():
             print(s)
             for byte in s:
                 self.process_signal(int(chr(byte)))
-     
-     # Read the received signal and call
-    def process_signal(self,signal):
+
+
+    # Read the next signal from the serial port and return it.
+    def read_one_signal(self, port=None):
+        connection = port if port else self.serial_port
+        while True:
+        # Read the data from arduino_connect.py
+            data = connection.readline()
+            if data:
+                return data
+
+    # Examine the recently-read signal and call one of several methods, depending
+    # upon the signal type. If it is a dot or dash, then call update current symbol; if it is a pause, then call
+    # handle symbol end or handle word end depending upon the type of pause
+    def process_signal(self, signal):
         # if we get a dot or dash append it to our current word.
-        if(signal == 0 or signal == 1):
-            self.current_word.append(signal)
+        if (signal == 1 or signal == 2):
+            self.update_current_symbol(signal)
         # if we get a letter pause signal we append the ascii letter to our word and add a space.
-        elif signal == 2:
-            asciiWord=self._morse_codes[self._morse_codes.index(self.current_word)-1]
-            self.append(asciiWord)
-            self.sentence_string.append(" ")
-        # if we get a word pause signal we print the word.
         elif signal == 3:
-            print(self.sentence_string)
+            self.handle_symbol_end()
+            self.current_message += (" ")
+        # if we get a word pause signal we print the word.
+        elif signal == 4:
+            self.handle_word_end()
+
+    # Append the current dot or dash onto the end of current_symbol.
+    def update_current_symbol(self, signal):
+        if signal == 2:
+            self.current_symbol += '1'
+        if signal == 1:
+            self.current_symbol += '0'
 
 
-    
+    # When the code for a symbol ends, use that code as a key into morse codes
+    # to find the appropriate symbol, which is then used as the argument in a call to update current word.
+    # Finally, reset current symbol to the empty string.
+    def handle_symbol_end(self):
+        value = self._morse_codes.get(self.current_symbol, '')
+        self.update_current_word(value)
+        self.current_symbol=""
+    # Add the most recently completed symbol onto current word.
+    def update_current_word(self, symbol):
+        self.current_word += (symbol)
+    # This should begin by calling handle symbol end; it should then print current
+    # word to the screen and, finally, reset current word to the empty string.
+    def handle_word_end(self):
+        self.handle_symbol_end()
+        print(self.current_word)
+        self.reset()
+
+
+
+
+
 ''' To test if this is working, do the following in a Python command window:
 
 > from morse_skeleton import *
@@ -89,3 +127,5 @@ the serial port.  Each time you press (or release) your morse-code device, a sig
 appear in your Python window. In Python, these signals typically look like this:
  b'5' or b'1' or b'3', etc.
 '''
+m = mocoder()
+m.decoding_loop()
