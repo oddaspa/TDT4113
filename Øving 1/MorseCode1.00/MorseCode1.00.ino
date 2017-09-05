@@ -17,10 +17,10 @@ const float dashTime = 3*T;
 const float letterPauseTime = 3*T;
 const float wordPauseTime = 7*T;
 
-const int dotSignal = 0; // Given by assignment.
-const int dashSignal = 1;
-const int letterPauseSignal = 2;
-const int wordPauseSignal = 3;
+const int dotSignal = 1; // Given by assignment.
+const int dashSignal = 2;
+const int letterPauseSignal = 3;
+const int wordPauseSignal = 4;
 
 void setup() {
   // initialize the button pin as a input:
@@ -29,6 +29,8 @@ void setup() {
   pinMode(dotPin, OUTPUT);
   // initialize the dashLED(Red) as output:
   pinMode(dashPin, OUTPUT);
+  // initialize the secLED(Blue) as output:
+  pinMode(secPin, OUTPUT);
   // initialize serial communication:
   Serial.begin(9600);
   
@@ -39,12 +41,12 @@ void loop()
   
   // While button is pressed we count
   while(digitalRead(buttonPin) == HIGH){
+    digitalWrite(secPin, HIGH);
     if (pauseTime != 0){
       getPause(pauseTime); // Method implemented below
       pauseTime=0;
     }
     millis_pressed=millis()-prev_millis;
-    digitalWrite(secPin, HIGH);
     buttonRelease=millis();
 
   }
@@ -55,7 +57,7 @@ void loop()
       digitalWrite(dashPin,HIGH);
       delay(300);
       // Python parse dash as "1".
-      Serial.println(dashSignal);
+      Serial.print(dashSignal);
       //Serial.print("Milliseconds held: ");
       //Serial.println(millis_pressed);
     }
@@ -63,7 +65,7 @@ void loop()
       digitalWrite(dotPin,HIGH);
       delay(300);
       // Python parse dot sign as "0".
-      Serial.println(dotSignal);
+      Serial.print(dotSignal);
       //Serial.print("Milliseconds held: ");
       //Serial.println(millis_pressed);
     }
@@ -78,11 +80,11 @@ void loop()
   digitalWrite(secPin,LOW);
 }
 void getPause(long pauseTime){
-    if(pauseTime<letterPauseTime+200){
-      Serial.println(letterPauseSignal);
+    if(pauseTime>letterPauseTime && pauseTime<letterPauseTime+400){
+      Serial.print(letterPauseSignal);
     }
-    else{
-      Serial.println(wordPauseSignal);
+    if(pauseTime>wordPauseTime+400){
+      Serial.print(wordPauseSignal);
     }
     // Make else method for resetting the process
 }
