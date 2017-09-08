@@ -9,6 +9,7 @@ class player():
         if action >2 or action <0:
             return "Illegal action"
         else:
+            self.action == action
             return action
 
 
@@ -19,3 +20,6 @@ class player():
 
     def get_result(self):
         player
+
+    def get_action(self):
+        return self.action
