@@ -136,42 +136,33 @@ class Historian(Player):
         remember = [0]
         remember.append(0)
         remember.append(0)
+        rockA = Action(Player._actions[0])
+        paperA = Action(Player._actions[1])
         prev_action = 0
         history = self.enemy.get_history()
-        if history != None:
-            last_move = history[-1]
-
+        if len(history) >1:
+            last_move = history[-2]
             for action in history:
-                if action == 0:
-                    if prev_action == 0:
+                if action == last_move:
+                    index = history.index(action)
+                    prev_action = history[index-1]
+                    if prev_action == rockA:
                         # increase rock by 1
                         remember[0] += 1
-                    elif prev_action == 1:
+                    elif prev_action == paperA:
                         # increase paper by 1
                         remember[1] += 1
                     else:
                         # increase scissor by 1
                         remember[2] += 1
-                elif action == 1:
-                    if prev_action == 1:
-                        # increase rock by 1
-                        remember[0] += 1
-                    elif prev_action == 1:
-                        # increase paper by 1
-                        remember[1] += 1
-                    else:
-                        # increase scissor by 1
-                        remember[2] += 1
-                else:
-                    if prev_action == 1:
-                        # increase rock by 1
-                        remember[0] += 1
-                    elif prev_action == 1:
-                        # increase paper by 1
-                        remember[1] += 1
-                    else:
-                        # increase scissor by 1
-                        remember[2] += 1
+            max_value = max(remember)
+            move = remember.index(max_value)
+        else:
+            move = random.randint(0,2)
+        A = Action(Player._actions[move])
+        self.action = A
+        self.history_of_actions.append(A)
+        return A
 
 class Action:
     def __init__(self, action1):
@@ -242,12 +233,11 @@ class Tournament:
         string = s.get_scores()
         print(string)
 
-    def __str__(self):
-        return
+
 
 def main():
     p1 = Random("Kari")
-    p2 = MostRegular("Ola",p1)
+    p2 = Historian("Ola",p1)
     t = Tournament(p1,p2,10)
     t.do_tournament()
     # print(p1.get_nice_history())
