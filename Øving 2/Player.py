@@ -1,5 +1,5 @@
 import random
-
+import matplotlib as plt
 
 class Player():
     # Class variables
@@ -220,20 +220,36 @@ class Tournament:
         self.games_left = numOfGames
 
     def do_tournament(self):
+        tot_s1 = 0
+        tot_s2 = 0
+        gevinst_s1 = []
+        x_akse = []
+        count = 0
         print(str(self.p1.name) + " vs " + str(self.p2.name) + "!!")
         s = SingleGame(self.p1, self.p2)
         for i in range(self.games_left):
             s.do_a_game()
+            count += 1
+            x_akse.append(count)
+            gevinst_s1.append(tot_s1 / count)
         if s.score2 > s.score1:
             print("Player 2 won!")
         elif s.score1 > s.score2:
             print("Player 1 won!")
         else:
             print("It's a draw!")
-        string = s.get_scores()
-        print(string)
+        print("\nTotal score in tournament:\n" + str(self.p1.name) + ": " + str(s.score1) + " poeng" +
+              "\n" + str(self.p2.name) + ": " + str(s.score2) + " poeng")
 
 
+    ##PYPLOT##
+    plt.plot(x_akse, score1)
+    plt.axis([0, self.numOfGames, 0, 1])
+    plt.grid(True)
+    plt.axhline(y=0.5, linewidth=0.5, color="r")
+    plt.xlabel("Antall Spill")
+    plt.ylabel("Gevinstprosent: " + str(self.p1))
+    plt.show()
 
 def main():
     p1 = Random("Kari")
