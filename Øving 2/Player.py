@@ -1,11 +1,14 @@
 import random
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 class Player():
     # Class variables
     _actions = {0:'rock',1:'paper',2:'scissor'}
     i = 0
-
+    # helper
+    def counter(self, num):
+        a = {0: 1, 1: 2, 2: 0}
+        return a[num]
     # Initializer
     def __init__(self,name):
         self.name = name
@@ -24,11 +27,11 @@ class Player():
         self.name = name
 
     # retrives past moves
-    def get_history(self):
-        return self.history_of_actions
+    def remember_move(self, action):
+        self.history_of_actions.append(action)
     #prettyPrints the history
     def get_nice_history(self):
-        hist = self.get_history()
+        hist = self.history_of_actions
         res = []
         for x in range(len(hist) -1):
             res.append(hist[x].action)
@@ -52,7 +55,6 @@ class Random(Player):
         action = random.randint(0,2)
         A = Action(Player._actions[action])
         self.action = A
-        self.history_of_actions.append(A)
         return A
 
 
@@ -74,7 +76,6 @@ class Secquential(Player):
                 self.prev_move = 0
         A = Action(Player._actions[self.prev_move])
         self.action = A
-        self.history_of_actions.append(A)
         return A
 
 
@@ -87,9 +88,8 @@ class Secquential(Player):
     # s˚a MestVanlig antar at stein vil komme igjen. Trekket fra MestVanllig er følgelig papir(ettersom papir sl˚ar
     # stein).
 class MostRegular(Player):
-    def __init__(self, name, enemy):
+    def __init__(self, name):
         Player.__init__(self, name)
-        self.enemy = enemy
 
     def pick_action(self):
         rock = 0
@@ -98,7 +98,7 @@ class MostRegular(Player):
         most_used = 1
         rockA = Action(Player._actions[0])
         paperA = Action(Player._actions[1])
-        history = self.enemy.get_history()
+        history = self.history_of_actions
         if history != []:
             for action in history:
                 if (action == rockA):
@@ -115,7 +115,6 @@ class MostRegular(Player):
                 most_used = 0
         A = Action(Player._actions[most_used])
         self.action = A
-        self.history_of_actions.append(A)
         return A
 
     # Historiker: Denne spilleren ser etter mønstre i m˚aten motstanderen spiller p˚a. Historiker defineres med en
@@ -127,25 +126,61 @@ class MostRegular(Player):
     # en saks er papir, og antar derfor at den neste aksjonen til motstanderen blir papir. Historiker velger dermed
     # saks(fordi saks vinner over papir).
 class Historian(Player):
-    def __init__(self,name,enemy):
+    def __init__(self,name,numOfActions):
         Player.__init__(self,name)
-        self.enemy = enemy
+        self.history_of_enemy = []
+        self.numOfActions = numOfActions
+
+    def get_valid_input(self):
+        vhistory = []
+        if(len(self.history_of_actions) > self.numOfActions):
+            mlist = []
+            for x in range(self.numOfActions-1):
+                x+=1
+                mlist.append(self.history_of_actions[-x])
+            i=0
+            j=0
+            for actions in self.history_of_actions:
+                i += 1
+                if j < self.numOfActions:
+                    if i < len(self.history_of_actions)-self.numOfActions:
+                        if actions == mlist[j]:
+                            j += 1
+                        if j == self.numOfActions-1:
+                            move = self.history_of_actions.index(actions)
+                            if i < len(self.history_of_actions):
+                                vhistory.append(self.history_of_actions[move+1])
+                                j = 0
+                        elif actions != mlist[j]:
+                            j = 0
+        return vhistory
+
 
 
     def pick_action(self):
+        i = 0
         remember = [0]
         remember.append(0)
         remember.append(0)
         rockA = Action(Player._actions[0])
         paperA = Action(Player._actions[1])
         prev_action = 0
-        history = self.enemy.get_history()
+        history = self.get_valid_input()
         if len(history) >1:
-            last_move = history[-2]
+            # checks what the previous move is
+            last_move = history[-1]
             for action in history:
+                # we keep track of where we are in history-list
+                i += 1
+                # if we are at the last element: break
+                if i == (len(history)):
+                    break
                 if action == last_move:
+                    # get index of previous move
                     index = history.index(action)
-                    prev_action = history[index-1]
+                    # check what action before that move was
+                    prev_action = history[index+1]
+                    # if action is rock append value to rock slot in remember array
                     if prev_action == rockA:
                         # increase rock by 1
                         remember[0] += 1
@@ -159,9 +194,9 @@ class Historian(Player):
             move = remember.index(max_value)
         else:
             move = random.randint(0,2)
+        move = self.counter(move)
         A = Action(Player._actions[move])
         self.action = A
-        self.history_of_actions.append(A)
         return A
 
 class Action:
@@ -208,7 +243,8 @@ class SingleGame:
             self.increase_score(1)
         elif action2 > action1:
             self.increase_score(2)
-
+        self.p1.remember_move(action2)
+        self.p2.remember_move(action1)
     def get_scores(self):
         return "Score Player 1: " + str(self.score1) + ". Score Player 2: " + str(self.score2)
 
@@ -220,18 +256,18 @@ class Tournament:
         self.games_left = numOfGames
 
     def do_tournament(self):
-        tot_s1 = 0
-        tot_s2 = 0
-        gevinst_s1 = []
-        x_akse = []
+        tot_p1 = 0
+        tot_p2 = 0
+        score_p1 = []
+        x_axis = []
         count = 0
         print(str(self.p1.name) + " vs " + str(self.p2.name) + "!!")
         s = SingleGame(self.p1, self.p2)
         for i in range(self.games_left):
             s.do_a_game()
             count += 1
-            x_akse.append(count)
-            gevinst_s1.append(tot_s1 / count)
+            x_axis.append(count)
+            score_p1.append(s.score1 / count)
         if s.score2 > s.score1:
             print("Player 2 won!")
         elif s.score1 > s.score2:
@@ -242,20 +278,41 @@ class Tournament:
               "\n" + str(self.p2.name) + ": " + str(s.score2) + " poeng")
 
 
-    ##PYPLOT##
-    plt.plot(x_akse, score1)
-    plt.axis([0, self.numOfGames, 0, 1])
-    plt.grid(True)
-    plt.axhline(y=0.5, linewidth=0.5, color="r")
-    plt.xlabel("Antall Spill")
-    plt.ylabel("Gevinstprosent: " + str(self.p1))
-    plt.show()
+        ##PYPLOT##
+        plt.plot(x_axis, score_p1)
+        plt.axis([0, self.games_left, 0, 1])
+        plt.grid(True)
+        plt.axhline(y=0.5, linewidth=0.5, color="r")
+        plt.xlabel("Antall Spill")
+        plt.ylabel("Gevinstprosent: " + str(self.p1.name))
+        plt.show()
 
 def main():
-    p1 = Random("Kari")
-    p2 = Historian("Ola",p1)
-    t = Tournament(p1,p2,10)
+    husk = 2
+    name1 = input("Name Player 1: ")
+    name2 = input("Name Player 2: ")
+    print("For Random press 0, for Sequential press 1, for Most Regular press 2, for Historian press 3")
+    playerType1 = int(input("Which player type do Player 1 want to be : "))
+    playerType2 = int(input("Which player type do Player 2 want to be : "))
+    if playerType1 == 0:
+        p1 = Random(name1)
+    elif playerType1 == 1:
+        p1 = Secquential(name1)
+    elif playerType1 == 2:
+        p1 = MostRegular(name1)
+    else:
+        p1 = Historian(name1, husk)
+    if playerType2 == 0:
+        p2 = Random(name2)
+    elif playerType2 == 1:
+        p2 = Secquential(name2)
+    elif playerType2 == 2:
+        p2 = MostRegular(name2)
+    else:
+        p2 = Historian(name2, husk)
+
+    games = int(input("How many games would you like to play: "))
+    t = Tournament(p1,p2,games)
     t.do_tournament()
-    # print(p1.get_nice_history())
-    # print(p2.get_nice_history())
+
 main()
