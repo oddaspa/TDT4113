@@ -2,6 +2,7 @@ from PIL import Image,ImageDraw
 from PIL import ImageFilter
 from PIL import ImageEnhance
 import shutil
+from random import shuffle
 
 
 
@@ -391,6 +392,12 @@ class Imager():
             return Imager(image=self.image)
 
 
+
+
+
+
+    ######## sub methods ########
+
     # chaning background
     def change_background(self,color):
         for x_pixel in range(self.xmax):
@@ -424,6 +431,82 @@ class Imager():
         return Imager(image=self.image)
 
 
+    def puzzlize(self,num_of_parts):
+        parts = []
+        startpoint = (0,0)
+        startpoints = [startpoint]
+        for x_pixel in range(self.xmax):
+            for y_pixel in range(self.ymax):
+                if x_pixel % int(self.xmax / num_of_parts) == 0 and y_pixel % int(self.ymax / num_of_parts) == 0:
+                        x_start, y_start = startpoint
+                        img = self.image.crop((x_start, y_start, x_pixel, y_pixel))
+                        image = Imager(image=img)
+                        parts.append(image)
+                        startpoint = (x_pixel, y_pixel)
+                        print(startpoint)
+                        startpoints.append(startpoint)
+        shuffle(parts)
+        print(parts)
+        i = 0
+        for x,y in startpoints:
+            if x != self.xmax or y != self.ymax:
+                if i < len(parts):
+                    self.paste(parts[i], x, y)
+                    i += 1
+        print(self.xmax, self.ymax)
+        return Imager(image=self.image)
+
+    def puzzlize2(self, num_of_parts):
+        parts = []
+        startpoint = (0,0)
+        startpoints = []
+        for x in range(num_of_parts-1):
+            for y in range(num_of_parts-1):
+                img = self.image.crop((int(self.xmax * x / num_of_parts), int(self.ymax * y / num_of_parts), int(self.xmax * (x+1) / num_of_parts), int(self.ymax * (y+1) / num_of_parts)))
+
+
+                parts.append(img)
+                x_start, y_start = startpoint
+                x_start = int(self.xmax*x / num_of_parts)
+                y_start = int(self.ymax*y / num_of_parts)
+                startpoint = (x_start, y_start)
+                startpoints.append(startpoint)
+        shuffle(parts)
+        print(startpoints)
+        i = 0
+        for x, y in startpoints:
+            if x != self.xmax or y != self.ymax:
+                if i < len(parts):
+                    print(parts[i])
+                    image = Imager(image=parts[i])
+                    self.paste(image, x, y)
+                    i += 1
+
+        return Imager(image=self.image)
+
+    def shuffleImageRows(self,image=False,faktor=100):
+        image = image if image else self.image
+        liste = list(image.getdata())
+        rows = []
+        for x in range(0,len(liste),faktor*image.size[0]):
+            rows.append(liste[x:x+faktor*image.size[0]])
+        shuffle(rows)
+        res = []
+        for row in rows:
+            for tup in row:
+                res.append(tup)
+        im2 = Image.new(image.mode,image.size)
+        im2.putdata(res)
+        return Imager(image=im2)
+
+    def shuffleImageCol(self,image=False,faktor=100):
+        image = image if image else self.image
+        image = Imager(image=image)
+
+        image = image.shuffleImageRows(faktor=faktor)
+
+        return image
+
 def main():
     Einstein = "einstein_patentoffice.jpg"
     Obama = "nobackgroundobama.png"
@@ -432,12 +515,7 @@ def main():
     #shutil.copy("image.png", "image2.png")
     # initialize imager object
     imager = Imager(Obama,image)
-    #imager.collage()
-    #imager.change_background(imager._pixel_colors["techi green"])
-    #imagedraw = imager.draw_a_cross()
-    pop_art = imager.pop_art(5,150)
-
-    pop_art.display()
-    #imager.display()
+    img = imager.puzzlize2(4)
+    img.display()
 
 main()
