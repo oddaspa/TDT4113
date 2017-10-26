@@ -1,0 +1,3 @@
+_pixel_colors = {"red":(255,0,0), "green": (0,255,0), "blue": (0,0,255), "white": (255,255,255), "black": (0,0,0),
+                     "purple rain":(104,33,101), "pink kimmy":(224,32,203), "blue waves":(32,94,224),
+                     "techi green":(119,204,98), "mustard":(240,216,72)}
