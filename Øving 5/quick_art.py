@@ -9,8 +9,9 @@ import shutil
 
 class Imager():
     _pixel_colors = {"red":(255,0,0), "green": (0,255,0), "blue": (0,0,255), "white": (255,255,255), "black": (0,0,0),
-                     "purple rain":(104,33,101), "pink kimmy":(224,32,203), "blue waves":(32,94,224),
-                     "techi green":(119,204,98), "mustard":(240,216,72)}
+                     "purple rain":(104,33,101), "pink kimmy":(224,32,203), "blue waves":(12,74,204),
+                     "techi green":(119,204,98), "mustard":(220,216,72), "geraldine":(250,140,130), "sunburn":(242,58,58),
+                     "dreaming of":(141,17,142),"delete the past":(29,50,78),"akuma fluff":(121,195,35)}
 
     def __init__(self,fid=False,image=False,width=100,height=100,background="black",mode="RGB"):
         self.fid = fid # The image file
@@ -174,118 +175,268 @@ class Imager():
         self.paste(portion, int(self.xmax / 2), int(self.ymax / 2))
         return Imager(image=self.image)
 
-    def shift_color(self,RGB):
-        R,G,B = RGB
-        for x_pixel in range(self.xmax):
-            for y_pixel in range(self.ymax):
-                im_R,im_G,im_B = self.get_pixel(x_pixel,y_pixel)
-                im_R += R
-                im_G += G
-                im_B += B
-                pixel_RGB = (im_R,im_G,im_B)
-                self.set_pixel(x_pixel,y_pixel,pixel_RGB)
 
-        return Imager(image=self.image)
 
     def pop_art(self,dim, colorshift):
         if dim == 4:
             # resize image to 1/4 size and add 4 images to original image
+            # NB I don't know why I have to create all instances and cant use just one instance
             portion = self.scale(0.5, 0.5)
+            portion1 = self.scale(0.5,0.5)
+            portion2 = self.scale(0.5,0.5)
+            # paste original in top right corner
             self.paste(portion, 0, 0)
-            shift_red = portion.shift_color((colorshift,0,0))
-            self.paste(shift_red, 0, int(self.ymax / 2))
-            # reset red shift
-            reset_red =  portion.shift_color((-colorshift,0,0))
+
+            # paste green in top left corner
             shift_green = portion.shift_color((0, colorshift,0))
             self.paste(shift_green, int(self.xmax / 2), 0)
-            # reset green shift
-            reset_green =  portion.shift_color((0,-colorshift,0))
-            shift_blue = portion.shift_color((0,0, colorshift))
-            self.paste(shift_blue, int(self.xmax / 2), int(self.ymax / 2))
+
+
+            # paste blue in down right corner
+            shift_blue = portion1.shift_color((0,0, colorshift))
+            self.paste(shift_blue, 0, int(self.ymax / 2))
+
+
+            # paste red in down left corner
+            shift_red = portion2.shift_color((colorshift, 0, 0))
+            self.paste(shift_red, int(self.xmax / 2), int(self.ymax / 2))
+            return Imager(image=self.image)
+
         if dim==9:
-            portion = self.scale(0.33,0.33)
+
+            # cut images 1/9th of original image
+            portion1 = self.scale(1/3, 1/3)
+            portion2 = self.scale(1/3, 1/3)
+            portion3 = self.scale(1/3, 1/3)
+            portion4 = self.scale(1/3, 1/3)
+            portion5 = self.scale(1/3, 1/3)
+            portion6 = self.scale(1/3, 1/3)
+            portion7 = self.scale(1/3, 1/3)
+            portion8 = self.scale(1/3, 1/3)
+            portion9 = self.scale(1/3, 1/3)
 
             # First row
-            # paste original image
-            self.paste(portion, 0, 0)
 
-            # apply filter purple rain
+            # top right corner
+            pink_kimmy = self._pixel_colors["pink kimmy"]
+            shift_pk = portion1.shift_color(pink_kimmy)
+            self.paste(shift_pk, 0, 0)
+
+
+            # top middle
             purple_rain = self._pixel_colors["purple rain"]
-            shift_green = portion.shift_color(purple_rain)
-            self.paste(shift_green, int(self.xmax / 3), 0)
-            # reset purple rain
-            R_pr,G_pr,B_pr =self._pixel_colors["purple rain"]
-            reset_pr = (-R_pr,-G_pr,-B_pr)
-            reset_green = shift_green.shift_color(reset_pr)
+            shift_pr = portion2.shift_color(purple_rain)
+            self.paste(shift_pr, int(self.xmax / 3), 0)
 
-            # apply filter mustard
+            # top left corner
             mustard = self._pixel_colors["mustard"]
-            apply_mustard = reset_green.shift_color(mustard)
-            self.paste(apply_mustard,int(self.xmax*2/3),0)
-            # reset mustard
-            R_ms,G_ms,B_ms = self._pixel_colors["mustard"]
-            reset_ms = (-R_ms,-G_ms,-B_ms)
-            reset_mustrad =apply_mustard.shift_color(reset_ms)
+            shift_mustard = portion3.shift_color(mustard)
+            self.paste(shift_mustard,int(self.xmax*2/3), 0)
+
 
             # Second row
 
-            shift_red = reset_mustrad.shift_color(self._pixel_colors["techi green"])
-            self.paste(portion, 0, int(self.ymax / 3))
-            # reset red shift
-            reset_red = portion.shift_color(self._pixel_colors["purple rain"])
-            shift_blue = portion.shift_color(self._pixel_colors["purple rain"])
-            self.paste(shift_blue, int(self.xmax / 3), int(self.ymax / 3))
+            # middle right
+            shift_techi = portion4.shift_color(self._pixel_colors["techi green"])
+            self.paste(shift_techi, 0, int(self.ymax / 3))
+
+            # center of image
+            shift_waves = portion5.shift_color(self._pixel_colors["blue waves"])
+            self.paste(shift_waves, int(self.xmax / 3), int(self.ymax / 3))
+
+            # middle left
+            shift_geraldine = portion6.shift_color(self._pixel_colors["geraldine"])
+            self.paste(shift_geraldine, int(self.xmax * 2 / 3), int(self.ymax / 3))
+
+            # third row
+
+            # down right corner
+            shift_sunburn = portion7.shift_color(self._pixel_colors["sunburn"])
+            self.paste(shift_sunburn, 0, int(self.ymax * 2/3))
+
+            # down center
+            shift_dreaming = portion8.shift_color(self._pixel_colors["dreaming of"])
+            self.paste(shift_dreaming, int(self.xmax / 3), int(self.ymax * 2 / 3))
+
+            # down left
+            shift_akuma = portion9.shift_color(self._pixel_colors["akuma fluff"])
+            self.paste(shift_akuma, int(self.xmax*2/3), int(self.ymax * 2 / 3))
+
+            return Imager(image=self.image)
 
 
-        if dim == 1:
-            # resize image to 1/4 size and add 4 images to original image
-            portion = self.scale(0.5, 0.5)
-            self.paste(portion, 0, 0)
-            portion1 = Imager(image=self.image)
-            # apply filter purple rain
+
+
+        if dim == 5:
+            # Andy Warhol type
+            # first create a black and white image
+
+            converter = ImageEnhance.Color(self.image)
+            img = converter.enhance(0.0)
+            img = Imager(image=img)
+
+            # and turn down the brightness
+
+
+
+            # cut images 1/9th of original image
+            portion1 = img.scale(1 / 3, 1 / 3)
+            portion2 = self.scale(1 / 3, 1 / 3)
+            portion3 = self.scale(1 / 3, 1 / 3)
+            portion4 = self.scale(1 / 3, 1 / 3)
+            portion5 = self.scale(1 / 3, 1 / 3)
+            portion6 = self.scale(1 / 3, 1 / 3)
+            portion7 = self.scale(1 / 3, 1 / 3)
+            portion8 = self.scale(1 / 3, 1 / 3)
+            portion9 = self.scale(1 / 3, 1 / 3)
+
+            # importing colors
+            pink_kimmy = self._pixel_colors["pink kimmy"]
             purple_rain = self._pixel_colors["purple rain"]
-            shift_green = portion.change_background(purple_rain)
-            self.paste(shift_green, int(self.xmax / 3), 0)
-            # reset purple rain
-            R_pr, G_pr, B_pr = self._pixel_colors["purple rain"]
-            reset_pr = (-R_pr, -G_pr, -B_pr)
-            reset_green = portion.change_background(reset_pr)
-
-            # apply filter mustard
             mustard = self._pixel_colors["mustard"]
-            apply_mustard = portion1.change_background(mustard)
-            self.paste(apply_mustard, int(self.xmax * 2 / 3), 0)
-            # reset mustard
-            R_ms, G_ms, B_ms = self._pixel_colors["mustard"]
-            reset_ms = (-R_ms, -G_ms, -B_ms)
-            portion.change_background(reset_ms)
+            pink_kimmy = self._pixel_colors["pink kimmy"]
+            techi_green = self._pixel_colors["techi green"]
+            blue_waves = self._pixel_colors["blue waves"]
+            geraldine = self._pixel_colors["geraldine"]
+            sunburn = self._pixel_colors["sunburn"]
+            dreaming_of = self._pixel_colors["dreaming of"]
+            akuma_fluff = self._pixel_colors["akuma fluff"]
+
+            # First row
 
 
-        return Imager(image=self.image)
+            #### change background ###
 
+            # top right corner
+
+            portion1.change_background(pink_kimmy)
+
+            # top middle
+
+            portion2.change_background(purple_rain)
+
+            # top left corner
+
+            portion3.change_background(mustard)
+
+            # Second row
+
+            # middle right
+            portion4.change_background(techi_green)
+
+            # center of image
+            portion5.change_background(blue_waves)
+
+            # middle left
+            portion6.change_background(geraldine)
+
+            # third row
+
+            # down right corner
+            portion7.change_background(sunburn)
+
+            # down center
+            portion8.change_background(dreaming_of)
+
+            # down left
+            portion9.change_background(akuma_fluff)
+
+            ### change profile color ##
+
+            # First row
+
+            # top right corner
+
+            shift_pk = portion1.shift_color(blue_waves)
+            self.paste(shift_pk, 0, 0)
+
+            # top middle
+
+            shift_pr = portion2.shift_color(geraldine)
+            self.paste(shift_pr, int(self.xmax / 3), 0)
+
+            # top left corner
+
+            shift_mustard = portion3.shift_color(sunburn)
+            self.paste(shift_mustard, int(self.xmax * 2 / 3), 0)
+
+            # Second row
+
+            # middle right
+            shift_techi = portion4.shift_color(dreaming_of)
+            self.paste(shift_techi, 0, int(self.ymax / 3))
+
+            # center of image
+            shift_waves = portion5.shift_color(akuma_fluff)
+            self.paste(shift_waves, int(self.xmax / 3), int(self.ymax / 3))
+
+            # middle left
+            shift_geraldine = portion6.shift_color(pink_kimmy)
+            self.paste(shift_geraldine, int(self.xmax * 2 / 3), int(self.ymax / 3))
+
+            # third row
+
+            # down right corner
+            shift_sunburn = portion7.shift_color(techi_green)
+            self.paste(shift_sunburn, 0, int(self.ymax * 2 / 3))
+
+            # down center
+            shift_dreaming = portion8.shift_color(mustard)
+            self.paste(shift_dreaming, int(self.xmax / 3), int(self.ymax * 2 / 3))
+
+            # down left
+            shift_akuma = portion9.shift_color(purple_rain)
+            self.paste(shift_akuma, int(self.xmax * 2 / 3), int(self.ymax * 2 / 3))
+
+            return Imager(image=self.image)
+
+
+    # chaning background
     def change_background(self,color):
         for x_pixel in range(self.xmax):
             for y_pixel in range(self.ymax):
                 im_R, im_G, im_B = self.get_pixel(x_pixel, y_pixel)
                 # if pixel is almost completely white
-                if im_R>250 and im_G > 250 and im_B > 250:
+                if im_R>254 and im_G > 254 and im_B > 254:
                     self.set_pixel(x_pixel,y_pixel,color)
         return Imager(image=self.image)
 
 
+    # shift color
+    def shift_color(self,RGB):
+        R,G,B = RGB
+        for x_pixel in range(self.xmax):
+            for y_pixel in range(self.ymax):
+                im_R,im_G,im_B = self.get_pixel(x_pixel,y_pixel)
+                if im_R < 254 and im_G < 254 and im_B < 254:
+                    im_R += R
+                    im_G += G
+                    im_B += B
+                    if im_R == 255:
+                        im_R -= 2
+                    if im_G == 255:
+                        im_G -= 2
+                    if im_B == 255:
+                        im_B -= 2
+                    pixel_RGB = (im_R,im_G,im_B)
+                    self.set_pixel(x_pixel,y_pixel,pixel_RGB)
+
+        return Imager(image=self.image)
+
 
 def main():
-    Guido = "Guido_van_Rossum.jpg"
     Einstein = "einstein_patentoffice.jpg"
+    Obama = "nobackgroundobama.png"
     # initialize image object
-    image = Image.open(Einstein)
+    image = Image.open(Obama)
     #shutil.copy("image.png", "image2.png")
     # initialize imager object
-    imager = Imager(Einstein,image)
+    imager = Imager(Obama,image)
     #imager.collage()
     #imager.change_background(imager._pixel_colors["techi green"])
     #imagedraw = imager.draw_a_cross()
-    pop_art = imager.pop_art(9,50)
+    pop_art = imager.pop_art(5,150)
+
     pop_art.display()
     #imager.display()
 
