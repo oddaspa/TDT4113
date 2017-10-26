@@ -265,68 +265,9 @@ class Imager():
             return Imager(image=self.image)
 
 
-        if dim == 2:
-            # cut images 1/9th of original image
-            portion1 = self.scale(1 / 3, 1 / 3)
-            portion2 = self.scale(1 / 3, 1 / 3)
-            portion3 = self.scale(1 / 3, 1 / 3)
-            portion4 = self.scale(1 / 3, 1 / 3)
-            portion5 = self.scale(1 / 3, 1 / 3)
-            portion6 = self.scale(1 / 3, 1 / 3)
-            portion7 = self.scale(1 / 3, 1 / 3)
-            portion8 = self.scale(1 / 3, 1 / 3)
-            portion9 = self.scale(1 / 3, 1 / 3)
-
-            # First row
-
-            # top right corner
-            pink_kimmy = self._pixel_colors["pink kimmy"]
-            shift_pk = portion1.change_background(pink_kimmy)
-            self.paste(shift_pk, 0, 0)
-
-            # top middle
-            purple_rain = self._pixel_colors["purple rain"]
-            shift_pr = portion2.change_background(purple_rain)
-            self.paste(shift_pr, int(self.xmax / 3), 0)
-
-            # top left corner
-            mustard = self._pixel_colors["mustard"]
-            shift_mustard = portion3.change_background(mustard)
-            self.paste(shift_mustard, int(self.xmax * 2 / 3), 0)
-
-            # Second row
-
-            # middle right
-            shift_techi = portion4.change_background(self._pixel_colors["techi green"])
-            self.paste(shift_techi, 0, int(self.ymax / 3))
-
-            # center of image
-            shift_waves = portion5.change_background(self._pixel_colors["blue waves"])
-            self.paste(shift_waves, int(self.xmax / 3), int(self.ymax / 3))
-
-            # middle left
-            shift_geraldine = portion6.change_background(self._pixel_colors["geraldine"])
-            self.paste(shift_geraldine, int(self.xmax * 2 / 3), int(self.ymax / 3))
-
-            # third row
-
-            # down right corner
-            shift_sunburn = portion7.change_background(self._pixel_colors["sunburn"])
-            self.paste(shift_sunburn, 0, int(self.ymax * 2 / 3))
-
-            # down center
-            shift_dreaming = portion8.change_background(self._pixel_colors["dreaming of"])
-            self.paste(shift_dreaming, int(self.xmax / 3), int(self.ymax * 2 / 3))
-
-            # down left
-            shift_akuma = portion9.change_background(self._pixel_colors["akuma fluff"])
-            self.paste(shift_akuma, int(self.xmax * 2 / 3), int(self.ymax * 2 / 3))
-
-            return Imager(image=self.image)
-
-        if dim==3:
 
 
+        if dim == 5:
             # Andy Warhol type
             # first create a black and white image
 
@@ -349,7 +290,6 @@ class Imager():
             portion8 = self.scale(1 / 3, 1 / 3)
             portion9 = self.scale(1 / 3, 1 / 3)
 
-
             # importing colors
             pink_kimmy = self._pixel_colors["pink kimmy"]
             purple_rain = self._pixel_colors["purple rain"]
@@ -364,99 +304,94 @@ class Imager():
 
             # First row
 
+
+            #### change background ###
+
             # top right corner
 
-            portion1.shift_color(pink_kimmy)
-
+            portion1.change_background(pink_kimmy)
 
             # top middle
 
-            shift_pr = portion2.shift_color(purple_rain)
-
+            portion2.change_background(purple_rain)
 
             # top left corner
 
-            shift_mustard = portion3.shift_color(mustard)
-
+            portion3.change_background(mustard)
 
             # Second row
 
             # middle right
-            shift_techi = portion4.shift_color(techi_green)
-
+            portion4.change_background(techi_green)
 
             # center of image
-            shift_waves = portion5.shift_color(blue_waves)
-
+            portion5.change_background(blue_waves)
 
             # middle left
-            shift_geraldine = portion6.shift_color(geraldine)
-
+            portion6.change_background(geraldine)
 
             # third row
 
             # down right corner
-            shift_sunburn = portion7.shift_color(sunburn)
-
+            portion7.change_background(sunburn)
 
             # down center
-            shift_dreaming = portion8.shift_color(dreaming_of)
-
+            portion8.change_background(dreaming_of)
 
             # down left
-            shift_akuma = portion9.shift_color(akuma_fluff)
+            portion9.change_background(akuma_fluff)
 
-
-
-            ### Changing background colors
+            ### change profile color ##
 
             # First row
 
             # top right corner
 
-            shift_pk = portion1.change_background(blue_waves)
+            shift_pk = portion1.shift_color(blue_waves)
             self.paste(shift_pk, 0, 0)
 
             # top middle
 
-            shift_pr = portion2.change_background(geraldine)
+            shift_pr = portion2.shift_color(geraldine)
             self.paste(shift_pr, int(self.xmax / 3), 0)
 
             # top left corner
 
-            shift_mustard = portion3.change_background(sunburn)
+            shift_mustard = portion3.shift_color(sunburn)
             self.paste(shift_mustard, int(self.xmax * 2 / 3), 0)
 
             # Second row
 
             # middle right
-            shift_techi = portion4.change_background(dreaming_of)
+            shift_techi = portion4.shift_color(dreaming_of)
             self.paste(shift_techi, 0, int(self.ymax / 3))
 
             # center of image
-            shift_waves = portion5.change_background(akuma_fluff)
+            shift_waves = portion5.shift_color(akuma_fluff)
             self.paste(shift_waves, int(self.xmax / 3), int(self.ymax / 3))
 
             # middle left
-            shift_geraldine = portion6.change_background(pink_kimmy)
+            shift_geraldine = portion6.shift_color(pink_kimmy)
             self.paste(shift_geraldine, int(self.xmax * 2 / 3), int(self.ymax / 3))
 
             # third row
 
             # down right corner
-            shift_sunburn = portion7.change_background(techi_green)
+            shift_sunburn = portion7.shift_color(techi_green)
             self.paste(shift_sunburn, 0, int(self.ymax * 2 / 3))
 
             # down center
-            shift_dreaming = portion8.change_background(mustard)
+            shift_dreaming = portion8.shift_color(mustard)
             self.paste(shift_dreaming, int(self.xmax / 3), int(self.ymax * 2 / 3))
 
             # down left
-            shift_akuma = portion9.change_background(purple_rain)
+            shift_akuma = portion9.shift_color(purple_rain)
             self.paste(shift_akuma, int(self.xmax * 2 / 3), int(self.ymax * 2 / 3))
 
             return Imager(image=self.image)
 
+
+    # chaning background
     def change_background(self,color):
         for x_pixel in range(self.xmax):
             for y_pixel in range(self.ymax):
@@ -466,6 +401,8 @@ class Imager():
                     self.set_pixel(x_pixel,y_pixel,color)
         return Imager(image=self.image)
 
+
+    # shift color
     def shift_color(self,RGB):
         R,G,B = RGB
         for x_pixel in range(self.xmax):
@@ -498,7 +435,7 @@ def main():
     #imager.collage()
     #imager.change_background(imager._pixel_colors["techi green"])
     #imagedraw = imager.draw_a_cross()
-    pop_art = imager.pop_art(3,150)
+    pop_art = imager.pop_art(5,150)
 
     pop_art.display()
     #imager.display()
