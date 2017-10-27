@@ -503,29 +503,37 @@ class Imager():
 def main():
     Einstein = "einstein_patentoffice.jpg"
     Obama = "obama.png"
+    Elephant = "elephant.jpg"
+    Birds = "birds.jpg"
     # initialize image object
     image = Image.open(Obama)
     image2 = Image.open(Einstein)
-
+    image3 = Image.open(Elephant)
+    image4 = Image.open(Birds)
     # initialize imager object
-    imager = Imager(Obama, image)
-    imager2 = Imager(Einstein,image2)
+    obama_imgr = Imager(Obama, image)
+    einstein_imgr = Imager(Einstein, image2)
+    elephant_imgr = Imager(Elephant, image3)
+    birds_imgr = Imager(Birds, image4)
 
     # try warhol art on obama picture
-    #imager.pop_art(3)
-    #imager.display()
+    elephant_imgr.pop_art(1)
+    elephant_imgr.display()
 
     # try random pop art on einstein
-    #imager2.pop_art(1)
-    #imager2.display()
+    einstein_imgr.pop_art(3)
+    einstein_imgr.display()
 
     # puzzlize on obama
-    #imager.puzzlize(4)
-    #imager.display()
+    # when puzzled is used with high numbers(1000) it creates the same image with micro changes
+    # (10000) is throws MemoryError
+    birds_imgr.puzzlize(9)
+    birds_imgr.display()
 
     # random warhol
-    imager.warhol_random()
-    imager.display()
+    obama_imgr.warhol_random()
+    obama_imgr.display()
 
     # PS I used portrait images with white background
     # pop_art method works with dim 1, 2 and 3 for different results
+main()
